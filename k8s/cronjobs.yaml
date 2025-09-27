@@ -1,0 +1,50 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: scale-up-day
+  namespace: mindbox-sre-test
+spec:
+  schedule: "0 6 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: scaler-sa
+          restartPolicy: OnFailure
+          containers:
+            - name: kubectl
+              image: bitnami/kubectl:1.27.4
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  DEPLOYMENT=$(kubectl get configmap mindbox-config -n mindbox-sre-test -o jsonpath='{.data.deployment_name}')
+                  NS=$(kubectl get configmap mindbox-config -n mindbox-sre-test -o jsonpath='{.data.deployment_namespace}')
+                  TARGET=$(kubectl get configmap mindbox-config -n mindbox-sre-test -o jsonpath='{.data.day_replicas}')
+                  kubectl scale deploy/${DEPLOYMENT} -n ${NS} --replicas=${TARGET}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: scale-down-night
+  namespace: mindbox-sre-test
+spec:
+  schedule: "0 22 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: scaler-sa
+          restartPolicy: OnFailure
+          containers:
+            - name: kubectl
+              image: bitnami/kubectl:1.27.4
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  DEPLOYMENT=$(kubectl get configmap mindbox-config -n mindbox-sre-test -o jsonpath='{.data.deployment_name}')
+                  NS=$(kubectl get configmap mindbox-config -n mindbox-sre-test -o jsonpath='{.data.deployment_namespace}')
+                  TARGET=$(kubectl get configmap mindbox-config -n mindbox-sre-test -o jsonpath='{.data.night_replicas}')
+                  kubectl scale deploy/${DEPLOYMENT} -n ${NS} --replicas=${TARGET}
+
