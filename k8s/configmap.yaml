@@ -12,4 +12,4 @@ data:
 day_replicas: "4"
 night_replicas: "1"
 deployment_name: "webapp"
-deployment_namespace: "mindbox-sre-test"
+deployment_namespace: "mindbox-sre-test" 
