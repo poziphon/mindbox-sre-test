@@ -6,7 +6,7 @@ metadata:
   labels:
     app: webapp
 spec:
-  replicas: 1 # базовый реплик, дальше HPA/cron
+  replicas: 1 
   selector:
     matchLabels:
       app: webapp
@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: webapp
-          image: nginx:1.25.0 # заменить на образ приложения
+          image: nginx:1.25.0 
           ports:
             - containerPort: 8080
           resources:
@@ -41,7 +41,7 @@ spec:
             httpGet:
               path: /ready
               port: 8080
-            failureThreshold: 12 # до ~60с инициализация
+            failureThreshold: 12 
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
